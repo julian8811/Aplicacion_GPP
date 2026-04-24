@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.streamlit/
+.vscode/
+*.xlsm
+*.docx
+*.pdf
+# Si querés subir el Excel, borrá la línea anterior

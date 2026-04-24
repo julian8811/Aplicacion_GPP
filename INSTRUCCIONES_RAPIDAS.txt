@@ -1,0 +1,105 @@
+================================================================================
+  INSTRUCCIONES RÁPIDAS - APLICACIÓN DE EVALUACIÓN GPP
+================================================================================
+
+📁 UBICACIÓN DE LA APLICACIÓN:
+   C:\Users\ASUS\OneDrive\Desktop\Aplicacion_GPP
+
+================================================================================
+🚀 INICIO RÁPIDO
+================================================================================
+
+OPCIÓN 1 - Usando archivos .bat (MÁS FÁCIL):
+   1. Doble clic en: instalar.bat (solo la primera vez)
+   2. Doble clic en: ejecutar.bat (cada vez que quiera usar la app)
+
+OPCIÓN 2 - Usando comandos (RECOMENDADO):
+   1. Abrir PowerShell o CMD en esta carpeta
+   2. Ejecutar: py -m pip install -r requirements.txt (solo la primera vez)
+   3. Ejecutar: streamlit run app.py
+
+================================================================================
+✅ VERIFICAR INSTALACIÓN
+================================================================================
+
+Para verificar que todo está correctamente instalado:
+   py verificar_instalacion.py
+
+================================================================================
+📋 USO DE LA APLICACIÓN
+================================================================================
+
+1. INICIO
+   - Lea las instrucciones
+   - Conozca la escala de calificación (1 = No cumple, 5 = Cumple plenamente)
+
+2. PROCESO ADMINISTRATIVO
+   - Evalúe: Planeación, Organización, Dirección, Control
+   - Califique cada variable de 1 a 5
+
+3. PROCESO OPERATIVO
+   - Evalúe: Logística de Compras, Gestión de Producción, Logística Externa
+   - Califique cada variable de 1 a 5
+
+4. RESULTADOS GENERALES
+   - Vea gráficos interactivos
+   - Analice el cumplimiento por área
+   - Revise tablas detalladas
+
+5. PRIORIDADES
+   - Identifique áreas de mejora
+   - Vea prioridades (Alta, Media, Baja)
+
+6. GUARDAR/CARGAR
+   - Guarde su evaluación
+   - Cargue evaluaciones anteriores
+   - Exporte a Excel
+
+================================================================================
+🎯 NIVELES DE PRIORIDAD
+================================================================================
+
+🔴 ALTA    (< 60%)   - Corregir en el CORTO PLAZO
+🟡 MEDIA   (60-74%)  - Atender en el MEDIANO PLAZO
+🟢 BAJA    (≥ 75%)   - No requiere atención inmediata
+
+================================================================================
+📞 AYUDA
+================================================================================
+
+Si tiene problemas:
+   1. Lea el archivo README.md para más detalles
+   2. Ejecute: py verificar_instalacion.py
+   3. Verifique que Python 3.8+ está instalado
+   4. Reinstale dependencias: py -m pip install -r requirements.txt --upgrade
+
+================================================================================
+📁 ARCHIVOS IMPORTANTES
+================================================================================
+
+app.py                         - Aplicación principal
+requirements.txt               - Lista de dependencias
+README.md                      - Documentación completa
+instalar.bat                  - Script de instalación
+ejecutar.bat                  - Script para ejecutar la app
+verificar_instalacion.py      - Script de verificación
+INSTRUCCIONES_RAPIDAS.txt     - Este archivo
+
+Los resultados se guardan en archivos JSON y XLSX en esta misma carpeta.
+
+================================================================================
+✨ ¡LISTO PARA EMPEZAR!
+================================================================================
+
+Ejecute: ejecutar.bat  o  streamlit run app.py
+
+La aplicación se abrirá automáticamente en su navegador en:
+http://localhost:8501
+
+Para detener la aplicación, presione Ctrl+C en la terminal.
+
+================================================================================
+
+
+
+

@@ -1,0 +1,253 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║        📄 CÓMO ABRIR Y USAR LA VERSIÓN HTML                               ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 ARCHIVO HTML CREADO:
+
+✅ app_gpp.html - Versión HTML completa de la aplicación
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 MÉTODO 1: DOBLE CLIC (Más fácil)
+
+1. Busque el archivo: app_gpp.html
+2. Haga doble clic sobre él
+3. Se abrirá automáticamente en su navegador predeterminado
+4. ¡Listo! Ya puede usar la aplicación
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 MÉTODO 2: DESDE EL NAVEGADOR
+
+1. Abra su navegador (Chrome, Firefox, Edge, etc.)
+2. Presione Ctrl + O (o Cmd + O en Mac)
+3. Navegue hasta:
+   C:\Users\ASUS\OneDrive\Desktop\Aplicacion_GPP\app_gpp.html
+4. Haga clic en "Abrir"
+5. ¡Listo! La aplicación se cargará
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 MÉTODO 3: ARRASTRAR Y SOLTAR
+
+1. Abra su navegador
+2. Arrastre el archivo app_gpp.html
+3. Suéltelo en la ventana del navegador
+4. ¡Listo! La aplicación se abrirá
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ CARACTERÍSTICAS DE LA VERSIÓN HTML:
+
+┌─ VENTAJAS
+│
+│  ✅ No requiere Python instalado
+│  ✅ No requiere Streamlit
+│  ✅ Funciona directamente en el navegador
+│  ✅ Fácil de compartir (solo envíe el archivo)
+│  ✅ Compatible con todos los navegadores modernos
+│  ✅ Rápido y ligero
+│  ✅ Mismo diseño que la versión Streamlit
+│  ✅ Nueva tipografía y colores aplicados
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─ FUNCIONALIDADES INCLUIDAS
+│
+│  ✅ Navegación por pestañas
+│  ✅ Página de inicio con información
+│  ✅ Formularios de evaluación
+│  ✅ Sección de resultados
+│  ✅ Análisis de prioridades
+│  ✅ Guardar y cargar evaluaciones
+│  ✅ Gráficos interactivos (Chart.js)
+│  ✅ Diseño responsive
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 DISEÑO Y ESTILO:
+
+┌─ TIPOGRAFÍA
+│
+│  ✅ Roboto - Texto general
+│  ✅ Montserrat - Headers y botones
+│  ✅ Outfit - Header principal
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─ COLORES
+│
+│  ✅ Púrpura elegante para headers
+│  ✅ Azul brillante para elementos secundarios
+│  ✅ Rosa vibrante para acentos
+│  ✅ Verde, naranja y rojo para prioridades
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─ EFECTOS
+│
+│  ✅ Animaciones suaves
+│  ✅ Transiciones elegantes
+│  ✅ Sombras profesionales
+│  ✅ Gradientes vibrantes
+│  ✅ Efectos hover interactivos
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 NAVEGADORES COMPATIBLES:
+
+✅ Google Chrome (Recomendado)
+✅ Mozilla Firefox
+✅ Microsoft Edge
+✅ Safari (Mac)
+✅ Opera
+✅ Brave
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 SECCIONES DISPONIBLES:
+
+1. 🏠 Inicio
+   - Información de bienvenida
+   - Guía de uso
+   - Características principales
+
+2. 📝 Proceso Administrativo
+   - Formulario de evaluación PA
+   - Selección de calificaciones
+   - Guardar evaluación
+
+3. ⚙️ Proceso Operativo
+   - Formulario de evaluación PO
+   - Próximamente implementado
+
+4. 📊 Resultados
+   - Métricas de cumplimiento
+   - Gráficos interactivos
+   - Análisis detallado
+
+5. 🎯 Prioridades
+   - Prioridad Alta (<50%)
+   - Prioridad Media (50-70%)
+   - Prioridad Baja (>70%)
+
+6. 💾 Guardar/Cargar
+   - Guardar evaluaciones en JSON
+   - Cargar evaluaciones previas
+   - Exportar resultados
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 CONSEJOS DE USO:
+
+┌─ RECOMENDACIONES
+│
+│  ✅ Use Chrome o Edge para mejor rendimiento
+│  ✅ Maximice la ventana para mejor visualización
+│  ✅ Guarde el archivo HTML en una carpeta segura
+│  ✅ Puede compartir el archivo por email o USB
+│  ✅ Active JavaScript en su navegador
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─ PROBLEMAS COMUNES
+│
+│  ❌ Si no se ven las fuentes:
+│     → Verifique su conexión a Internet
+│     → Las fuentes de Google requieren conexión
+│
+│  ❌ Si no funcionan los gráficos:
+│     → Verifique su conexión a Internet
+│     → Chart.js se carga desde CDN
+│
+│  ❌ Si no se guardan los datos:
+│     → Es normal, el HTML es solo visualización
+│     → Use la versión Streamlit para persistencia
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📤 COMPARTIR LA APLICACIÓN HTML:
+
+┌─ MÉTODO 1: Por correo electrónico
+│
+│  1. Adjunte el archivo app_gpp.html
+│  2. Envíe el correo
+│  3. El destinatario solo necesita abrirlo
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─ MÉTODO 2: Por USB o red local
+│
+│  1. Copie app_gpp.html a USB
+│  2. Entregue el USB
+│  3. Copie y abra en cualquier computadora
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─ MÉTODO 3: Hosting web
+│
+│  1. Suba app_gpp.html a un servidor web
+│  2. Comparta el enlace
+│  3. Accesible desde cualquier navegador
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆚 HTML vs STREAMLIT:
+
+┌─ VERSIÓN HTML (app_gpp.html)
+│
+│  ✅ No requiere instalación
+│  ✅ Funciona sin servidor
+│  ✅ Fácil de compartir
+│  ❌ Funcionalidad limitada
+│  ❌ Sin persistencia de datos real
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+┌─ VERSIÓN STREAMLIT (app.py)
+│
+│  ✅ Funcionalidad completa
+│  ✅ Persistencia de datos
+│  ✅ Cálculos avanzados
+│  ✅ Exportación a Excel
+│  ❌ Requiere Python y Streamlit
+│
+└─────────────────────────────────────────────────────────────────────────────
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ ¡DISFRUTE DE SU APLICACIÓN HTML!
+
+La versión HTML es perfecta para:
+✅ Presentaciones y demos
+✅ Compartir con usuarios sin conocimientos técnicos
+✅ Visualización rápida del diseño
+✅ Mostrar el concepto de la aplicación
+
+Para uso completo y producción, use la versión Streamlit (app.py)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 Archivo: app_gpp.html
+📁 Ubicación: C:\Users\ASUS\OneDrive\Desktop\Aplicacion_GPP\
+🌐 Tamaño: ~30 KB
+✨ Estado: Listo para usar
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    🌐 VERSIÓN HTML LISTA PARA USAR 🌐                     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+

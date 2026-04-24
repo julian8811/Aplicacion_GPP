@@ -20,134 +20,141 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilos CSS profesionales y modernos - Diseño 'The Clinical Architect'
+# Estilos CSS profesionales y modernos - Diseño 'Stitch Modern UI Redesign'
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     :root {
-        --primary: #003544;
-        --primary-container: #004d61;
-        --secondary: #2d628c;
-        --tertiary: #003730;
-        --bg-main: #f8f9fa;
+        --primary: #0058be;
+        --primary-container: #2170e4;
+        --secondary: #545f73;
+        --tertiary: #b81120;
+        --bg-main: #f7f9fb;
         --bg-card: #ffffff;
-        --text-base: #191c1d;
-        --text-muted: #40484c;
-        --border-color: rgba(192, 200, 204, 0.2);
-        --success: #00a896;
+        --text-base: #191c1e;
+        --text-muted: #424754;
+        --border-color: #e0e3e5;
+        --success: #10b981;
+        --warning: #f59e0b;
         --error: #ba1a1a;
-        --font-header: 'Manrope', sans-serif;
-        --font-body: 'Inter', sans-serif;
+        --font-main: 'Inter', sans-serif;
+        --shadow-sm: 0px 4px 12px rgba(30, 41, 59, 0.05);
+        --shadow-md: 0px 10px 25px rgba(30, 41, 59, 0.1);
     }
 
     /* Global Streamlit Overrides */
     .stApp {
         background-color: var(--bg-main);
-        font-family: var(--font-body);
+        font-family: var(--font-main);
         color: var(--text-base);
     }
 
     /* Sidebar Styling */
     section[data-testid="stSidebar"] {
-        background-color: var(--primary) !important;
-        color: white !important;
+        background-color: #0f172a !important;
+        border-right: 1px solid #1e293b;
     }
     
     section[data-testid="stSidebar"] .stMarkdown, 
     section[data-testid="stSidebar"] label,
     section[data-testid="stSidebar"] p {
-        color: #e1e3e4 !important;
+        color: #94a3b8 !important;
+    }
+
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] h2, 
+    section[data-testid="stSidebar"] h3 {
+        color: white !important;
     }
 
     /* Typography */
     h1, h2, h3, h4 {
-        font-family: var(--font-header) !important;
-        color: var(--primary) !important;
+        font-family: var(--font-main) !important;
+        color: var(--text-base) !important;
         font-weight: 700 !important;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
     }
 
     .title-modern {
-        font-family: var(--font-header);
-        background: linear-gradient(135deg, var(--primary), var(--primary-container));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-family: var(--font-main);
+        color: var(--text-base);
         font-weight: 800;
-        font-size: 2.8rem;
+        font-size: 2.2rem;
         margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
     }
 
-    /* Modern Cards (Editorial Data Aesthetic) */
+    /* Modern Cards (Bento Style) */
     .modern-card {
         background: var(--bg-card);
-        padding: 2rem;
-        border-radius: 6px;
+        padding: 1.5rem;
+        border-radius: 16px;
         border: 1px solid var(--border-color);
-        box-shadow: 0 12px 32px -4px rgba(0, 31, 41, 0.05);
+        box-shadow: var(--shadow-sm);
         margin-bottom: 1.5rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: all 0.2s ease;
     }
     
     .modern-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 16px 48px -8px rgba(0, 31, 41, 0.1);
+        box-shadow: var(--shadow-md);
     }
 
     .metric-card-modern {
         background: white;
         padding: 1.5rem;
-        border-radius: 6px;
-        border: none;
-        box-shadow: 0 4px 20px rgba(0, 53, 68, 0.05);
-        text-align: center;
-        border-top: 4px solid var(--tertiary);
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        text-align: left;
     }
 
     .metric-value-modern {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--primary);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-base);
         line-height: 1.2;
     }
 
     .metric-label-modern {
         color: var(--text-muted);
-        font-weight: 600;
-        font-size: 0.75rem;
+        font-weight: 500;
+        font-size: 0.8rem;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin-bottom: 0.5rem;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
     }
 
     /* Buttons */
     .stButton > button {
         background-color: var(--primary) !important;
         color: white !important;
-        border-radius: 0.5rem !important;
+        border-radius: 0.75rem !important;
         border: none !important;
-        padding: 0.6rem 1.5rem !important;
+        padding: 0.5rem 1.2rem !important;
         font-weight: 600 !important;
         transition: all 0.2s !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 88, 190, 0.2);
     }
 
     .stButton > button:hover {
-        background-color: var(--primary-hover) !important;
-        box-shadow: 0 10px 15px -3px rgb(79 70 229 / 0.3) !important;
+        background-color: var(--primary-container) !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 88, 190, 0.3) !important;
     }
 
     /* Tabs/Expanders */
     .stTabs [data-baseweb="tab-list"] {
         background-color: transparent !important;
-        gap: 8px !important;
+        gap: 12px !important;
     }
 
     .stTabs [data-baseweb="tab"] {
-        height: 44px !important;
-        border-radius: 0.5rem !important;
+        height: 48px !important;
+        border-radius: 0.75rem !important;
         border: 1px solid var(--border-color) !important;
         background-color: white !important;
         color: var(--text-muted) !important;
+        padding: 0 1.5rem !important;
     }
 
     .stTabs [aria-selected="true"] {
@@ -157,19 +164,47 @@ st.markdown("""
     }
 
     .streamlit-expanderHeader {
-        background-color: #f1f5f9 !important;
-        border-radius: 0.5rem !important;
-        border: none !important;
+        background-color: #f8fafc !important;
+        border-radius: 0.75rem !important;
+        border: 1px solid var(--border-color) !important;
+    }
+
+    /* Header Nav Simulation */
+    .nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+
+    .logo-text {
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        font-size: 1.25rem;
+        color: #0f172a;
     }
 
     /* Banner */
     .banner-modern {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        color: white;
+        background: white;
+        color: var(--text-base);
         padding: 2.5rem;
-        border-radius: 1rem;
+        border-radius: 20px;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Footer */
+    .footer-modern {
+        margin-top: 5rem;
+        padding: 3rem 0;
+        border-top: 1px solid var(--border-color);
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--text-muted);
     }
 
     </style>

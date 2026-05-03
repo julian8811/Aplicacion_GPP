@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -16,6 +17,7 @@ type ActionPlan = {
   responsible: string
   due_date: string | null
   status: 'pendiente' | 'en_progreso' | 'completada'
+  priority?: string
 }
 
 type SortKey = 'status' | 'due_date'
@@ -325,6 +327,7 @@ function NewActionPlanForm({
 export function ActionPlanPage() {
   const [searchParams] = useSearchParams()
   const evaluationId = searchParams.get('evaluation_id') || ''
+  const queryClient = useQueryClient()
   
   const { data: actionPlans, isLoading } = useActionPlans(evaluationId || undefined)
   const { data: recommendations } = useRecommendations(evaluationId)
@@ -405,6 +408,7 @@ export function ActionPlanPage() {
 
     setAutoPopulateCount(null)
     toast.success(`${altaRecommendations.length} acciones creadas desde recomendaciones`)
+    queryClient.invalidateQueries({ queryKey: ['action-plans'] })
   }
   
   if (isLoading) {
@@ -460,7 +464,11 @@ export function ActionPlanPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No hay acciones creadas para esta evaluación.</p>
+            <p className="text-muted-foreground">
+              {evaluationId
+                ? 'No hay acciones creadas para esta evaluación.'
+                : 'No hay acciones creadas. Selecciona una evaluación para ver sus acciones o crear nuevas.'}
+            </p>
             {evaluationId && (
               <p className="text-sm text-muted-foreground mt-2">
                 Usa el formulario de arriba para crear tu primera acción.

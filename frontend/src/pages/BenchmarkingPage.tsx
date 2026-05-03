@@ -20,7 +20,11 @@ import {
 } from 'recharts'
 import { TrendingUp, TrendingDown, Minus, Target, ArrowLeftRight, Info } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useBenchmarks } from '@/hooks/useBenchmarks'
+import { useBenchmarks, useBenchmarkSectors } from '@/hooks/useBenchmarks'
+
+// Sector options
+const DEFAULT_SECTOR = 'restaurant'
+const SECTOR_OPTIONS = ['restaurant', 'hotel', 'retail']
 
 // Types
 interface Evaluation {
@@ -162,6 +166,10 @@ function TrendIndicator({ from, to }: { from: number; to: number }) {
 export function BenchmarkingPage() {
   const navigate = useNavigate()
   const [showIndustryAvg, setShowIndustryAvg] = useState(false)
+  const [selectedSector, setSelectedSector] = useState(DEFAULT_SECTOR)
+
+  // Fetch available sectors from backend
+  const { data: availableSectors } = useBenchmarkSectors()
 
   // Fetch all evaluations
   const { data: evaluations, isLoading: evalsLoading } = useQuery({
@@ -182,7 +190,7 @@ export function BenchmarkingPage() {
   })
 
   // Fetch industry benchmarks
-  const { data: benchmarks } = useBenchmarks('restaurant')
+  const { data: benchmarks } = useBenchmarks(selectedSector)
 
   const isLoading = evalsLoading || plansLoading
 
@@ -313,15 +321,34 @@ export function BenchmarkingPage() {
                     Mostrar promedio de la industria
                   </label>
                   <p className="text-sm text-muted-foreground">
-                    Compara tu rendimiento con el sector restaurantero
+                    Compara tu rendimiento con el sector
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Info className="w-4 h-4" />
-                <span>
-                  Datos indicativos: {industryAverages.totalSample} empresas • Fuente: {industryAverages.source}
-                </span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <label htmlFor="sector-select" className="text-sm text-muted-foreground">
+                    Sector:
+                  </label>
+                  <select
+                    id="sector-select"
+                    value={selectedSector}
+                    onChange={(e) => setSelectedSector(e.target.value)}
+                    className="px-2 py-1 border border-border rounded-lg bg-background text-foreground text-sm"
+                  >
+                    {SECTOR_OPTIONS.map((sector) => (
+                      <option key={sector} value={sector}>
+                        {sector.charAt(0).toUpperCase() + sector.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Info className="w-4 h-4" />
+                  <span>
+                    Datos indicativos: {industryAverages.totalSample} empresas • Fuente: {industryAverages.source}
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -486,7 +513,7 @@ export function BenchmarkingPage() {
               <div className="flex items-center gap-2">
                 <div className="w-4 h-0.5 bg-gray-400 border-dashed border-t-2" />
                 <span className="text-muted-foreground">
-                  El promedio de la industria se basa en {industryAverages.totalSample} empresas del sector restaurantero
+                  El promedio de la industria se basa en {industryAverages.totalSample} empresas del sector {selectedSector}
                 </span>
               </div>
               <p className="text-muted-foreground">

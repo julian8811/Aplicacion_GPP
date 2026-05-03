@@ -27,7 +27,7 @@ class EvaluationUpdate(BaseModel):
     pa_pct: Optional[float] = None
     po_pct: Optional[float] = None
     evaluaciones_pa: Optional[Dict[str, Dict[str, int]]] = None
-    evaluaciones_po: Optional[Dict[str, Dict[str, int]] = None
+    evaluaciones_po: Optional[Dict[str, Dict[str, int]]] = None
     establishment_name: Optional[str] = None
 
 
@@ -113,7 +113,7 @@ def _compute_priority(pa_pct: float, po_pct: float) -> str:
 async def list_evaluations(user: dict = Depends(get_current_user)):
     """List all evaluations for the current user"""
     supabase = get_supabase_client()
-    response = supabase.table("evaluations").select("*").eq("owner_id", user["id"]).order("fecha", desc=True).execute()
+    response = supabase.table("evaluations").select("*").order("fecha", desc=True).execute()
     return response.data
 
 
@@ -127,7 +127,6 @@ async def create_evaluation(data: EvaluationCreate, user: dict = Depends(get_cur
         "po_pct": data.po_pct,
         "evaluaciones_pa": data.evaluaciones_pa,
         "evaluaciones_po": data.evaluaciones_po,
-        "owner_id": user["id"]
     }
     response = supabase.table("evaluations").insert(evaluation_data).execute()
     return response.data[0] if response.data else None

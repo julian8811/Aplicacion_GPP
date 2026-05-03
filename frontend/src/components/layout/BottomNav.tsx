@@ -16,7 +16,11 @@ const navItems = [
   { to: '/settings', icon: Settings, label: 'Ajustes' },
 ]
 
-export function BottomNav() {
+interface BottomNavProps {
+  overdueCount?: number
+}
+
+export function BottomNav({ overdueCount = 0 }: BottomNavProps) {
   const location = useLocation()
   
   return (
@@ -24,17 +28,24 @@ export function BottomNav() {
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
           const isActive = location.pathname === item.to
+          const showBadge = item.to === '/action-plans' && overdueCount > 0
+          
           return (
             <Link
               key={item.to}
               to={item.to}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 h-full",
+                "flex flex-col items-center justify-center gap-1 flex-1 h-full relative",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}
             >
               <item.icon size={20} />
               <span className="text-xs font-medium">{item.label}</span>
+              {showBadge && (
+                <span className="absolute top-1 right-1/2 translate-x-4 bg-error text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {overdueCount > 9 ? '9+' : overdueCount}
+                </span>
+              )}
             </Link>
           )
         })}

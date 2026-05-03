@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Dict, Any
+from app.core.dependencies import get_current_user
 
 router = APIRouter(prefix="/results", tags=["results"])
 
@@ -11,7 +12,7 @@ class ResultsRequest(BaseModel):
 
 
 @router.post("/calculate")
-async def calculate_results(data: ResultsRequest):
+async def calculate_results(data: ResultsRequest, user: dict = Depends(get_current_user)):
     """
     Calculate results from evaluation ratings.
     Ratings are 0-5, converted to percentage (rating/5 * 100)

@@ -12,3 +12,4 @@ pytest-cov
 httpx
 pydantic-settings>=2.0.0
 openpyxl
+resend

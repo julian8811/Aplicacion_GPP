@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; }
+        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #333; color: white; padding: 12px; text-align: left; }
+        .button { display: inline-block; background: #f5576c; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 20px 0; }
+        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Recordatorio de Planes de Acción</h1>
+        <p>Tienes {plan_count} plan(es) que requieren atención</p>
+    </div>
+    <div class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th>Plan</th>
+                    <th>Fecha Límite</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {plans_table}
+            </tbody>
+        </table>
+        <p style="text-align: center;">
+            <a href="{dashboard_url}" class="button">Ver todos los planes</a>
+        </p>
+        <p>No dejes que tus tareas se acumulen. Revisa y actualiza el estado de tus planes de acción.</p>
+    </div>
+    <div class="footer">
+        Este es un email automático. No respondas a este mensaje.
+    </div>
+</body>
+</html>

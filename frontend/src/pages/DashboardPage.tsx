@@ -2,16 +2,17 @@ import { Link } from 'react-router-dom'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { useGuestUser } from '@/contexts/GuestUserContext'
+import { useAuth } from '@/hooks/useAuth'
 import api from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { BarChart3, ClipboardList, TrendingUp, Calendar, Activity, PlusCircle, Eye, BarChart2 } from 'lucide-react'
 import { formatDate, getScoreColor } from '@/lib/utils'
 import { Skeleton } from '@/components/shared/Skeleton'
+import { ActionPlanSummaryWidget } from '@/components/dashboard/ActionPlanSummaryWidget'
 
 export function DashboardPage() {
-  const user = useGuestUser()
-  
+  const { user, isGuest } = useAuth()
+
   const { data: evaluations, isLoading } = useQuery({
     queryKey: ['evaluations'],
     queryFn: async () => {
@@ -19,7 +20,7 @@ export function DashboardPage() {
       return response.data
     },
   })
-  
+
   const latestEval = evaluations?.[0]
 
   // Health index gauge color
@@ -29,17 +30,23 @@ export function DashboardPage() {
     return '#be123c' // red
   }
 
+  const displayName = isGuest
+    ? 'Invitado'
+    : user?.email?.split('@')[0] || 'Usuario'
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            Hola, {user?.full_name || user?.email}
+            Hola, {displayName}
           </h1>
-          <p className="text-muted-foreground">
-            {user?.establishment_name || 'Configura tu establecimiento'}
-          </p>
+          {isGuest && (
+            <p className="text-muted-foreground text-sm">
+              Modo invitado - los cambios no se guardaran
+            </p>
+          )}
         </div>
         <div className="flex gap-2 items-center">
           {evaluations && evaluations.length >= 2 && (
@@ -58,7 +65,7 @@ export function DashboardPage() {
           </Link>
         </div>
       </div>
-      
+
       {/* Health Index Gauge + KPIs */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Health Index Gauge */}
@@ -201,7 +208,10 @@ export function DashboardPage() {
           </Card>
         </div>
       </div>
-      
+
+      {/* Action Plan Summary Widget - only show if logged in (not guest) */}
+      {!isGuest && <ActionPlanSummaryWidget />}
+
       {/* Quick Actions */}
       <div className="flex gap-4 flex-wrap">
         <Link to="/evaluate">
@@ -219,7 +229,7 @@ export function DashboardPage() {
           </Link>
         )}
       </div>
-      
+
       {/* Recent evaluations */}
       <Card>
         <CardHeader>
@@ -235,8 +245,8 @@ export function DashboardPage() {
           ) : evaluations?.length > 0 ? (
             <div className="space-y-4">
               {evaluations.slice(0, 5).map((eval_: any) => (
-                <div 
-                  key={eval_.id} 
+                <div
+                  key={eval_.id}
                   className="flex items-center justify-between p-4 bg-secondary rounded-lg hover:bg-secondary/80 transition-colors"
                 >
                   <div className="flex-1">
@@ -248,7 +258,7 @@ export function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant={
-                      eval_.general_pct >= 75 ? 'success' : 
+                      eval_.general_pct >= 75 ? 'success' :
                       eval_.general_pct >= 60 ? 'warning' : 'error'
                     }>
                       {eval_.general_pct.toFixed(0)}%

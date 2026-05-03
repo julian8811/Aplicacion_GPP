@@ -12,6 +12,9 @@ import { HistoryPage } from '@/pages/HistoryPage'
 import { BenchmarkingPage } from '@/pages/BenchmarkingPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { NewEvaluationPage } from '@/pages/NewEvaluationPage'
+import { LoginPage } from '@/pages/auth/LoginPage'
+import { SignupPage } from '@/pages/auth/SignupPage'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { Toaster } from 'sonner'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 
@@ -21,8 +24,13 @@ export default function App() {
       <Toaster position="top-right" richColors />
       <ErrorBoundary>
         <Routes>
-          <Route path="/" element={<AppShell />}>
-            <Route index element={<Navigate to="/dashboard" />} />
+          {/* Public auth routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+
+          {/* Protected routes wrapped in AppShell */}
+          <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+            <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="evaluate" element={<NewEvaluationPage />} />
             <Route path="evaluate/wizard" element={<EvaluationWizardPage />} />

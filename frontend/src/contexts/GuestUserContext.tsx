@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, ReactNode } from 'react'
 
 export type User = {
   id: string
@@ -16,11 +16,30 @@ const guestUser: User = {
   establishment_name: undefined
 }
 
-const GuestUserContext = createContext(guestUser)
+interface GuestUserContextType {
+  user: User
+  isGuest: boolean
+}
 
-export function GuestUserProvider({ children }: { children: React.ReactNode }) {
+const GuestUserContext = createContext<GuestUserContextType>({
+  user: guestUser,
+  isGuest: true
+})
+
+export function GuestUserProvider({
+  children,
+  isGuestMode = false
+}: {
+  children: ReactNode
+  isGuestMode?: boolean
+}) {
   return (
-    <GuestUserContext.Provider value={guestUser}>
+    <GuestUserContext.Provider
+      value={{
+        user: isGuestMode ? guestUser : { ...guestUser, id: '' },
+        isGuest: isGuestMode
+      }}
+    >
       {children}
     </GuestUserContext.Provider>
   )

@@ -1,14 +1,223 @@
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
-import { Shield } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import { api } from '@/lib/api'
+import { useAuthStore } from '@/stores/authStore'
+import { Bell, Shield, Palette, Save, Check, Upload, Image as ImageIcon } from 'lucide-react'
+import { BrandingPreview } from '@/components/settings/BrandingPreview'
+
+interface NotificationPreferences {
+  action_plan_reminders: boolean
+  weekly_summary: boolean
+  marketing: boolean
+}
+
+interface BrandingSettings {
+  logo_url: string | null
+  primary_color: string
+  footer_text: string
+}
 
 export function SettingsPage() {
+  const { user } = useAuthStore()
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
+    action_plan_reminders: true,
+    weekly_summary: true,
+    marketing: false,
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  // Branding state
+  const [branding, setBranding] = useState<BrandingSettings>({
+    logo_url: null,
+    primary_color: '#2563eb',
+    footer_text: '',
+  })
+  const [brandingSaved, setBrandingSaved] = useState(false)
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
+  const establishmentName = 'Mi Establecimiento'
+
+  // Fetch current branding on mount
+  useEffect(() => {
+    async function fetchBranding() {
+      try {
+        const response = await api.get('/profiles/me/branding')
+        if (response.data) {
+          setBranding({
+            logo_url: response.data.logo_url || null,
+            primary_color: response.data.primary_color || '#2563eb',
+            footer_text: response.data.footer_text || '',
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch branding:', error)
+      }
+    }
+    fetchBranding()
+  }, [])
+
   const handleGoogleConnect = () => {
     // Placeholder for future OAuth integration
+  }
+
+  const handleToggle = (key: keyof NotificationPreferences) => {
+    setPreferences(prev => ({ ...prev, [key]: !prev[key] }))
+    setSaved(false)
+  }
+
+  const handleSavePreferences = async () => {
+    if (!user) return
+
+    setIsLoading(true)
+    setSaved(false)
+
+    try {
+      await api.put('/notifications/preferences', preferences)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (error) {
+      console.error('Failed to save preferences:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen')
+      return
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('El archivo debe ser menor a 2MB')
+      return
+    }
+
+    setIsUploadingLogo(true)
+
+    try {
+      // Convert to base64 for simplicity (alternatively use Supabase Storage)
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const base64 = e.target?.result as string
+        setBranding(prev => ({ ...prev, logo_url: base64 }))
+        setIsUploadingLogo(false)
+      }
+      reader.onerror = () => {
+        alert('Error al leer el archivo')
+        setIsUploadingLogo(false)
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('Logo upload error:', error)
+      setIsUploadingLogo(false)
+    }
+  }
+
+  const handleSaveBranding = async () => {
+    if (!user) return
+
+    setIsLoading(true)
+    setBrandingSaved(false)
+
+    try {
+      await api.patch('/profiles/me', {
+        logo_url: branding.logo_url,
+        primary_color: branding.primary_color,
+        footer_text: branding.footer_text,
+      })
+      setBrandingSaved(true)
+      setTimeout(() => setBrandingSaved(false), 3000)
+    } catch (error) {
+      console.error('Failed to save branding:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="space-y-6 max-w-3xl">
       <h1 className="text-2xl font-bold text-foreground">Configuración</h1>
+
+      {/* Section: Email Notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notificaciones por Email
+          </CardTitle>
+          <CardDescription>
+            Configura qué emails quieres recibir
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Action plan reminders */}
+          <div className="flex items-center justify-between py-3 border-b">
+            <div className="space-y-0.5">
+              <div className="font-medium">Recordatorios de planes de acción</div>
+              <div className="text-sm text-muted-foreground">
+                7 días antes, el día del vencimiento, y cuando están vencidos
+              </div>
+            </div>
+            <ToggleSwitch
+              checked={preferences.action_plan_reminders}
+              onChange={() => handleToggle('action_plan_reminders')}
+            />
+          </div>
+
+          {/* Weekly summary */}
+          <div className="flex items-center justify-between py-3 border-b">
+            <div className="space-y-0.5">
+              <div className="font-medium">Resumen semanal</div>
+              <div className="text-sm text-muted-foreground">
+                Un email cada semana con tu actividad y estadísticas
+              </div>
+            </div>
+            <ToggleSwitch
+              checked={preferences.weekly_summary}
+              onChange={() => handleToggle('weekly_summary')}
+            />
+          </div>
+
+          {/* Marketing emails */}
+          <div className="flex items-center justify-between py-3">
+            <div className="space-y-0.5">
+              <div className="font-medium">Emails de marketing</div>
+              <div className="text-sm text-muted-foreground">
+                Novedades, tips y contenido promocional
+              </div>
+            </div>
+            <ToggleSwitch
+              checked={preferences.marketing}
+              onChange={() => handleToggle('marketing')}
+            />
+          </div>
+
+          <div className="pt-4 flex items-center gap-3">
+            <Button onClick={handleSavePreferences} disabled={isLoading} size="sm">
+              {isLoading ? (
+                'Guardando...'
+              ) : saved ? (
+                <>
+                  <Check className="h-4 w-4 mr-1" />
+                  Guardado
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-1" />
+                  Guardar preferencias
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Section: Connected Accounts */}
       <Card>
@@ -59,6 +268,159 @@ export function SettingsPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Section: Branding */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            Personalización de Marca
+          </CardTitle>
+          <CardDescription>
+            Configura el aspecto de tus PDFs generados
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Branding Settings Form */}
+            <div className="space-y-4">
+              {/* Logo Upload */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Logo</label>
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 border rounded-lg flex items-center justify-center bg-secondary overflow-hidden">
+                    {branding.logo_url ? (
+                      <img
+                        src={branding.logo_url}
+                        alt="Logo"
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="logo-upload"
+                      className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md border hover:bg-secondary transition-colors cursor-pointer"
+                    >
+                      <Upload className="h-4 w-4 mr-1" />
+                      {isUploadingLogo ? 'Subiendo...' : 'Subir Logo'}
+                    </label>
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={isUploadingLogo}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Max 2MB, JPG o PNG</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Primary Color */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Color Principal</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={branding.primary_color}
+                    onChange={(e) => setBranding(prev => ({ ...prev, primary_color: e.target.value }))}
+                    className="w-12 h-10 rounded border cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={branding.primary_color}
+                    onChange={(e) => setBranding(prev => ({ ...prev, primary_color: e.target.value }))}
+                    className="flex-1 px-3 py-2 border rounded-md text-sm"
+                    placeholder="#2563eb"
+                  />
+                </div>
+              </div>
+
+              {/* Footer Text */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Texto de Pie de Página</label>
+                <input
+                  type="text"
+                  value={branding.footer_text}
+                  onChange={(e) => setBranding(prev => ({ ...prev, footer_text: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-md text-sm"
+                  placeholder="Texto personalizado para el pie del PDF"
+                  maxLength={100}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Máx. 100 caracteres
+                </p>
+              </div>
+
+              {/* Save Button */}
+              <Button onClick={handleSaveBranding} disabled={isLoading}>
+                {isLoading ? (
+                  'Guardando...'
+                ) : brandingSaved ? (
+                  <>
+                    <Check className="h-4 w-4 mr-1" />
+                    Guardado
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-1" />
+                    Guardar Marca
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Live Preview */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Vista Previa</label>
+              <BrandingPreview
+                logoUrl={branding.logo_url}
+                primaryColor={branding.primary_color}
+                footerText={branding.footer_text}
+                establishmentName={establishmentName}
+              />
+              <p className="text-xs text-muted-foreground">
+                Así se verá tu PDF con la configuración actual
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
+  )
+}
+
+// Toggle Switch component
+interface ToggleSwitchProps {
+  checked: boolean
+  onChange: () => void
+}
+
+function ToggleSwitch({ checked, onChange }: ToggleSwitchProps) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className={`
+        relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent 
+        transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 
+        focus-visible:ring-primary focus-visible:ring-offset-2
+        ${checked ? 'bg-primary' : 'bg-muted'}
+      `}
+    >
+      <span
+        className={`
+          pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 
+          transition duration-200 ease-in-out
+          ${checked ? 'translate-x-5' : 'translate-x-0'}
+        `}
+      />
+    </button>
   )
 }

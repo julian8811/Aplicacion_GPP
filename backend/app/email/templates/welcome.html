@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; }
+        .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+        .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 20px 0; }
+        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>¡Bienvenido, {name}!</h1>
+    </div>
+    <div class="content">
+        <p>Gracias por unirte a <strong>{establishment_name}</strong>. Estamos encantados de tenerte a bordo.</p>
+        <p>Con nuestra herramienta podrás:</p>
+        <ul>
+            <li>Evaluar tus procesos operativos</li>
+            <li>Crear planes de acción concretos</li>
+            <li>Comparar tu rendimiento con estándares de la industria</li>
+            <li>Generar informes profesionales en PDF</li>
+        </ul>
+        <p style="text-align: center;">
+            <a href="{dashboard_url}" class="button">Comenzar primera evaluación</a>
+        </p>
+        <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+        <p>Saludos,<br>El equipo de {establishment_name}</p>
+    </div>
+    <div class="footer">
+        Este email fue enviado porque te registraste en {establishment_name}.
+    </div>
+</body>
+</html>

@@ -1,9 +1,12 @@
 from fpdf import FPDF
 from datetime import datetime
+import urllib.request
+import io
 
 
 def crear_pdf_auditoria(nombre_est, fecha, resultados, evals_pa, evals_po,
-                        matriz_pa=None, matriz_po=None, recommendations=None, action_plans=None):
+                        matriz_pa=None, matriz_po=None, recommendations=None, action_plans=None,
+                        logo_url=None, primary_color=None, footer_text=None):
     """
     Generate professional PDF audit report for GPP evaluation.
 
@@ -17,15 +20,37 @@ def crear_pdf_auditoria(nombre_est, fecha, resultados, evals_pa, evals_po,
         matriz_po: PO matrix data (optional)
         recommendations: List of {aspect, element, recommendation, priority}
         action_plans: List of action plans
+        logo_url: URL to logo image for PDF header (optional)
+        primary_color: Hex color for header and accents (optional, default blue)
+        footer_text: Custom text for footer (optional)
     """
+    # Default primary color to blue if not provided
+    if not primary_color:
+        primary_color = "#2563eb"
+
+    # Parse hex color to RGB
+    header_rgb = _hex_to_rgb(primary_color)
+
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
 
     # === PAGE 1: Header and Summary ===
     pdf.add_page()
 
-    # Header
-    pdf.set_fill_color(41, 128, 185)  # Professional blue
+    # Header with optional logo and branding
+    if logo_url:
+        try:
+            # Try to fetch and embed logo
+            logo_data = _fetch_image_data(logo_url)
+            if logo_data:
+                # Add logo on the right side
+                pdf.image(logo_data, x=150, y=8, w=40)
+        except Exception:
+            # If logo fails, just use text header
+            pass
+
+    # Colored header bar
+    pdf.set_fill_color(*header_rgb)
     pdf.rect(0, 0, 210, 40, 'F')
     pdf.set_font("Helvetica", "B", 20)
     pdf.set_text_color(255, 255, 255)
@@ -188,6 +213,8 @@ def crear_pdf_auditoria(nombre_est, fecha, resultados, evals_pa, evals_po,
     pdf.set_y(-20)
     pdf.set_font("Helvetica", "", 8)
     pdf.set_text_color(127, 127, 127)
+    if footer_text:
+        pdf.cell(0, 10, footer_text, ln=True, align="C")
     pdf.cell(0, 10, f"GPP Auditoria - {nombre_est} - Generado {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True, align="C")
 
     return bytes(pdf.output())
@@ -346,3 +373,18 @@ def _element_from_question_id(q_id, aspect):
         "LOGISTICA EXTERNA": "Logistica Externa"
     }
     return element_mapping.get(aspect, aspect)
+
+
+def _hex_to_rgb(hex_color: str) -> tuple:
+    """Convert hex color string to RGB tuple"""
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+
+def _fetch_image_data(url: str) -> bytes:
+    """Fetch image data from URL and return as bytes"""
+    try:
+        with urllib.request.urlopen(url, timeout=10) as response:
+            return io.BytesIO(response.read())
+    except Exception:
+        return None

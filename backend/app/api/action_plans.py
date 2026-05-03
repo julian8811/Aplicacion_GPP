@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from supabase import create_client
 from app.config import get_settings
 from app.core.dependencies import get_current_user
+from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta
 
@@ -11,6 +12,27 @@ router = APIRouter(prefix="/action-plans", tags=["action-plans"])
 def get_supabase_client():
     settings = get_settings()
     return create_client(settings.supabase_url, settings.supabase_anon_key)
+
+
+class ActionPlanCreate(BaseModel):
+    evaluation_id: Optional[str] = None
+    element: Optional[str] = None
+    action: Optional[str] = None
+    responsible: Optional[str] = None
+    due_date: Optional[str] = None
+    status: Optional[str] = "pendiente"
+    title: Optional[str] = None
+
+
+class ActionPlanUpdate(BaseModel):
+    evaluation_id: Optional[str] = None
+    element: Optional[str] = None
+    action: Optional[str] = None
+    responsible: Optional[str] = None
+    due_date: Optional[str] = None
+    status: Optional[str] = None
+    title: Optional[str] = None
+    active: Optional[bool] = None
 
 
 @router.get("")
@@ -63,12 +85,12 @@ async def list_action_plans(
 
 
 @router.post("")
-async def create_action_plan(data: dict, user: dict = Depends(get_current_user)):
+async def create_action_plan(data: ActionPlanCreate, user: dict = Depends(get_current_user)):
     """Create a new action plan"""
     supabase = get_supabase_client()
 
     plan_data = {
-        **data,
+        **{k: v for k, v in data.model_dump().items() if v is not None},
         "owner_id": user["id"]
     }
     response = supabase.table("action_plans").insert(plan_data).execute()
@@ -97,7 +119,7 @@ async def create_action_plan(data: dict, user: dict = Depends(get_current_user))
 @router.put("/{action_plan_id}")
 async def update_action_plan(
     action_plan_id: str,
-    data: dict,
+    data: ActionPlanUpdate,
     user: dict = Depends(get_current_user)
 ):
     """Update an action plan"""
@@ -108,7 +130,7 @@ async def update_action_plan(
     if not response.data:
         raise HTTPException(status_code=404, detail="Action plan not found")
 
-    update_data = {k: v for k, v in data.items() if k not in ["id", "owner_id", "created_at"]}
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
     updated = supabase.table("action_plans").update(update_data).eq("id", action_plan_id).execute()
     updated_plan = updated.data[0] if updated.data else None
 

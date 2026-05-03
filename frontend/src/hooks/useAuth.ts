@@ -94,6 +94,7 @@ export function useAuth() {
       if (session) {
         setSession(session)
       } else {
+        setSession(null)
         checkGuestMode()
       }
     })

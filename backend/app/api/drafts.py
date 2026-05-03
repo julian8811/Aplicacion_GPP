@@ -3,7 +3,8 @@ import json
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import FileResponse
-from typing import Optional
+from pydantic import BaseModel
+from typing import Optional, Dict
 import uuid
 from app.core.dependencies import get_current_user
 
@@ -18,11 +19,18 @@ def _ensure_drafts_dir():
     os.makedirs(DRAFTS_DIR, exist_ok=True)
 
 
+class DraftSave(BaseModel):
+    pa_values: Optional[Dict[str, Dict[str, int]]] = {}
+    po_values: Optional[Dict[str, Dict[str, int]]] = {}
+    fecha: Optional[str] = None
+    establecimiento: Optional[str] = ""
+
+
 @router.post("")
-async def save_draft(data: dict, user: dict = Depends(get_current_user)):
+async def save_draft(data: DraftSave, user: dict = Depends(get_current_user)):
     """
     Save evaluation draft as a JSON file.
-    
+
     Request body:
     {
         "pa_values": {...},
@@ -32,25 +40,25 @@ async def save_draft(data: dict, user: dict = Depends(get_current_user)):
     }
     """
     _ensure_drafts_dir()
-    
+
     # Generate filename with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     unique_id = str(uuid.uuid4())[:8]
     filename = f"draft_{timestamp}_{unique_id}.json"
     filepath = os.path.join(DRAFTS_DIR, filename)
-    
+
     # Add metadata
     draft_data = {
         "fecha_guardado": datetime.now().isoformat(),
-        "pa_values": data.get("pa_values", {}),
-        "po_values": data.get("po_values", {}),
-        "fecha": data.get("fecha"),
-        "establecimiento": data.get("establecimiento", ""),
+        "pa_values": data.pa_values or {},
+        "po_values": data.po_values or {},
+        "fecha": data.fecha,
+        "establecimiento": data.establecimiento or "",
     }
-    
+
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(draft_data, f, indent=2, ensure_ascii=False)
-    
+
     return {"filename": filename, "path": filepath}
 
 

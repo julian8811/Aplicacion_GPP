@@ -3,6 +3,7 @@ from supabase import create_client
 from app.config import get_settings
 from app.api.matrices import MATRIZ_PA, MATRIZ_PO
 from app.core.dependencies import get_current_user
+from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
 router = APIRouter(prefix="/evaluations", tags=["evaluations"])
@@ -11,6 +12,23 @@ router = APIRouter(prefix="/evaluations", tags=["evaluations"])
 def get_supabase_client():
     settings = get_settings()
     return create_client(settings.supabase_url, settings.supabase_anon_key)
+
+
+class EvaluationCreate(BaseModel):
+    general_pct: float = 0
+    pa_pct: float = 0
+    po_pct: float = 0
+    evaluaciones_pa: Dict[str, Dict[str, int]] = {}
+    evaluaciones_po: Dict[str, Dict[str, int]] = {}
+
+
+class EvaluationUpdate(BaseModel):
+    general_pct: Optional[float] = None
+    pa_pct: Optional[float] = None
+    po_pct: Optional[float] = None
+    evaluaciones_pa: Optional[Dict[str, Dict[str, int]]] = None
+    evaluaciones_po: Optional[Dict[str, Dict[str, int]] = None
+    establishment_name: Optional[str] = None
 
 
 def _build_questions_from_evals(
@@ -100,15 +118,15 @@ async def list_evaluations(user: dict = Depends(get_current_user)):
 
 
 @router.post("")
-async def create_evaluation(data: dict, user: dict = Depends(get_current_user)):
+async def create_evaluation(data: EvaluationCreate, user: dict = Depends(get_current_user)):
     """Create a new evaluation"""
     supabase = get_supabase_client()
     evaluation_data = {
-        "general_pct": data.get("general_pct", 0),
-        "pa_pct": data.get("pa_pct", 0),
-        "po_pct": data.get("po_pct", 0),
-        "evaluaciones_pa": data.get("evaluaciones_pa", {}),
-        "evaluaciones_po": data.get("evaluaciones_po", {}),
+        "general_pct": data.general_pct,
+        "pa_pct": data.pa_pct,
+        "po_pct": data.po_pct,
+        "evaluaciones_pa": data.evaluaciones_pa,
+        "evaluaciones_po": data.evaluaciones_po,
         "owner_id": user["id"]
     }
     response = supabase.table("evaluations").insert(evaluation_data).execute()
@@ -151,7 +169,7 @@ async def get_evaluation(evaluation_id: str, user: dict = Depends(get_current_us
 
 
 @router.put("/{evaluation_id}")
-async def update_evaluation(evaluation_id: str, data: dict, user: dict = Depends(get_current_user)):
+async def update_evaluation(evaluation_id: str, data: EvaluationUpdate, user: dict = Depends(get_current_user)):
     """Update an evaluation"""
     supabase = get_supabase_client()
 
@@ -160,8 +178,8 @@ async def update_evaluation(evaluation_id: str, data: dict, user: dict = Depends
     if not response.data:
         raise HTTPException(status_code=404, detail="Evaluation not found")
 
-    evaluation_data = {k: v for k, v in data.items() if k not in ["id", "owner_id", "created_at"]}
-    response = supabase.table("evaluations").update(evaluation_data).eq("id", evaluation_id).execute()
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    response = supabase.table("evaluations").update(update_data).eq("id", evaluation_id).execute()
     return response.data[0]
 
 

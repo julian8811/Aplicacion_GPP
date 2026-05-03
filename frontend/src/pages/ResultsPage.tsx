@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useSearchParams } from 'react-router-dom'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -242,7 +242,10 @@ async function handleDownloadExcel(id: string) {
 }
 
 export function ResultsPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id: idParam } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
+  const idFromQuery = searchParams.get('id')
+  const id = idParam || idFromQuery
 
   const { data: evaluation, isLoading } = useQuery({
     queryKey: ['evaluation', id],

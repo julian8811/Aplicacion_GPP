@@ -20,7 +20,7 @@ import {
 } from 'recharts'
 import { TrendingUp, TrendingDown, Minus, Target, ArrowLeftRight, Info } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useBenchmarks, useBenchmarkSectors } from '@/hooks/useBenchmarks'
+import { useBenchmarks } from '@/hooks/useBenchmarks'
 
 // Sector options
 const DEFAULT_SECTOR = 'restaurant'
@@ -168,9 +168,6 @@ export function BenchmarkingPage() {
   const [showIndustryAvg, setShowIndustryAvg] = useState(false)
   const [selectedSector, setSelectedSector] = useState(DEFAULT_SECTOR)
 
-  // Fetch available sectors from backend
-  const { data: availableSectors } = useBenchmarkSectors()
-
   // Fetch all evaluations
   const { data: evaluations, isLoading: evalsLoading } = useQuery({
     queryKey: ['evaluations'],
@@ -189,7 +186,7 @@ export function BenchmarkingPage() {
     },
   })
 
-  // Fetch industry benchmarks
+  // Fetch benchmarks for the selected sector
   const { data: benchmarks } = useBenchmarks(selectedSector)
 
   const isLoading = evalsLoading || plansLoading

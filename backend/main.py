@@ -10,7 +10,9 @@ settings = get_settings()
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
+    "https://frontend-iota-blond-75.vercel.app",
     "https://*.vercel.app",
+    "*",  # Allow all origins for development
 ]
 
 app.add_middleware(

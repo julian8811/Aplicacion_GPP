@@ -1,5 +1,5 @@
 // supabase/functions/check-due-notifications/index.ts
-// Cron function that runs daily to check for due action plans and send reminders
+// Cron function that runs daily to check for due action plans and evaluation schedules
 // Schedule: Daily at 08:00 UTC
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
@@ -14,6 +14,13 @@ interface DueNotification {
     due_date: string
     status: string
   }>
+}
+
+interface ScheduleNotification {
+  schedule_id: string
+  user_id: string
+  schedule_name: string
+  due_date: string
 }
 
 // Convert due_date to a friendly format
@@ -31,6 +38,30 @@ function getPlanStatus(dueDate: string): "pending" | "overdue" {
   const now = new Date()
   const due = new Date(dueDate)
   return due < now ? "overdue" : "pending"
+}
+
+// Calculate next due date based on frequency
+function calculateNextDue(currentDue: string, frequency: string): string {
+  const date = new Date(currentDue)
+  
+  switch (frequency) {
+    case 'monthly':
+      date.setMonth(date.getMonth() + 1)
+      break
+    case 'quarterly':
+      date.setMonth(date.getMonth() + 3)
+      break
+    case 'biannual':
+      date.setMonth(date.getMonth() + 6)
+      break
+    case 'annual':
+      date.setFullYear(date.getFullYear() + 1)
+      break
+    default:
+      date.setMonth(date.getMonth() + 3) // Default to quarterly
+  }
+  
+  return date.toISOString()
 }
 
 async function queryDueNotifications(supabase: any): Promise<DueNotification[]> {
@@ -76,8 +107,56 @@ async function queryDueNotifications(supabase: any): Promise<DueNotification[]> 
   return Array.from(userNotifications.values())
 }
 
-async function triggerSendEmail(supabase: any, userId: string, plans: any[]) {
+async function queryDueSchedules(supabase: any): Promise<ScheduleNotification[]> {
+  const now = new Date()
+  
+  // Query schedules where:
+  // 1. next_due is within reminder_days_before from now
+  // 2. active = true
+  const { data: schedules, error } = await supabase
+    .from("evaluation_schedules")
+    .select("id, name, next_due, reminder_days_before, created_by")
+    .eq("active", true)
+
+  if (error) {
+    console.error("Error querying evaluation_schedules:", error)
+    throw error
+  }
+
+  if (!schedules || schedules.length === 0) {
+    console.log("No due schedules")
+    return []
+  }
+
+  // Filter schedules that are due for reminder
+  const dueSchedules: ScheduleNotification[] = []
+  
+  for (const schedule of schedules) {
+    const nextDue = new Date(schedule.next_due)
+    const reminderThreshold = new Date(now.getTime() + schedule.reminder_days_before * 24 * 60 * 60 * 1000)
+    
+    // Check if next_due is between now and reminder_days_before
+    if (nextDue >= now && nextDue <= reminderThreshold) {
+      dueSchedules.push({
+        schedule_id: schedule.id,
+        user_id: schedule.created_by,
+        schedule_name: schedule.name,
+        due_date: formatDate(schedule.next_due),
+      })
+    }
+  }
+
+  return dueSchedules
+}
+
+async function triggerSendEmail(supabase: any, userId: string, plans: any[], type: string = "action_plan_reminder", scheduleInfo?: any) {
   const sendEmailUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-email`
+
+  const payload: any = {
+    type,
+    user_id: userId,
+    data: type === "schedule_reminder" ? { schedule: scheduleInfo } : { action_plans: plans },
+  }
 
   const response = await fetch(sendEmailUrl, {
     method: "POST",
@@ -85,11 +164,7 @@ async function triggerSendEmail(supabase: any, userId: string, plans: any[]) {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
     },
-    body: JSON.stringify({
-      type: "action_plan_reminder",
-      user_id: userId,
-      data: { action_plans: plans },
-    }),
+    body: JSON.stringify(payload),
   })
 
   return response.json()
@@ -105,6 +180,22 @@ async function markRemindersSent(supabase: any, planIds: string[]) {
     console.error("Error updating reminder_sent:", error)
     throw error
   }
+}
+
+async function updateScheduleNextDue(supabase: any, scheduleId: string, currentDue: string, frequency: string) {
+  const nextDue = calculateNextDue(currentDue, frequency)
+  
+  const { error } = await supabase
+    .from("evaluation_schedules")
+    .update({ next_due: nextDue })
+    .eq("id", scheduleId)
+
+  if (error) {
+    console.error("Error updating schedule next_due:", error)
+    throw error
+  }
+  
+  return nextDue
 }
 
 serve(async (req) => {
@@ -125,50 +216,102 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Get all due notifications grouped by user
+    // Process action plan reminders
     const notifications = await queryDueNotifications(supabase)
-    console.log(`Found ${notifications.length} users with due notifications`)
+    console.log(`Found ${notifications.length} users with due action plan notifications`)
 
-    let successCount = 0
-    let failCount = 0
-    const processedPlanIds: string[] = []
+    let planSuccessCount = 0
+    let planFailCount = 0
 
     for (const notification of notifications) {
       try {
-        console.log(`Sending reminder to user ${notification.user_id} with ${notification.plans.length} plans`)
+        console.log(`Sending action plan reminder to user ${notification.user_id} with ${notification.plans.length} plans`)
 
         const result = await triggerSendEmail(supabase, notification.user_id, notification.plans)
 
         if (result.success) {
-          successCount++
-          // Note: We'd need the plan IDs to mark them as sent
-          // For now, we'll track which plans we processed
+          planSuccessCount++
         } else {
           console.error(`Failed to send email to user ${notification.user_id}:`, result.error)
-          failCount++
+          planFailCount++
         }
       } catch (error) {
         console.error(`Error processing notification for user ${notification.user_id}:`, error)
-        failCount++
+        planFailCount++
       }
     }
 
-    // If we successfully sent emails, mark the plans as processed
-    // Note: In a production scenario, we'd want to track which specific plan IDs were sent
-    // This is a simplified version that marks all plans as sent after processing
-    if (successCount > 0) {
-      console.log(`Successfully sent ${successCount} notifications`)
+    // Process evaluation schedule reminders
+    const scheduleNotifications = await queryDueSchedules(supabase)
+    console.log(`Found ${scheduleNotifications.length} schedules due for reminder`)
+
+    let scheduleSuccessCount = 0
+    let scheduleFailCount = 0
+
+    for (const schedule of scheduleNotifications) {
+      try {
+        console.log(`Sending schedule reminder for "${schedule.schedule_name}" to user ${schedule.user_id}`)
+
+        const result = await triggerSendEmail(
+          supabase, 
+          schedule.user_id, 
+          [], 
+          "schedule_reminder",
+          {
+            name: schedule.schedule_name,
+            due_date: schedule.due_date,
+          }
+        )
+
+        if (result.success) {
+          scheduleSuccessCount++
+          
+          // Update next_due based on frequency
+          // Get the frequency from the schedule first
+          const { data: scheduleData } = await supabase
+            .from("evaluation_schedules")
+            .select("next_due, frequency")
+            .eq("id", schedule.schedule_id)
+            .single()
+          
+          if (scheduleData) {
+            await updateScheduleNextDue(
+              supabase, 
+              schedule.schedule_id, 
+              scheduleData.next_due, 
+              scheduleData.frequency
+            )
+            console.log(`Updated schedule ${schedule.schedule_id} next_due`)
+          }
+        } else {
+          console.error(`Failed to send schedule reminder for ${schedule.schedule_name}:`, result.error)
+          scheduleFailCount++
+        }
+      } catch (error) {
+        console.error(`Error processing schedule reminder for ${schedule.schedule_name}:`, error)
+        scheduleFailCount++
+      }
     }
 
-    const message = `Processed ${notifications.length} users: ${successCount} successful, ${failCount} failed`
+    const totalSuccess = planSuccessCount + scheduleSuccessCount
+    const totalFail = planFailCount + scheduleFailCount
+
+    const message = `Processed action plans: ${planSuccessCount} sent, ${planFailCount} failed | Schedules: ${scheduleSuccessCount} sent, ${scheduleFailCount} failed`
 
     return new Response(JSON.stringify({
       success: true,
       message,
       details: {
-        users_processed: notifications.length,
-        success_count: successCount,
-        fail_count: failCount,
+        action_plans: {
+          users_processed: notifications.length,
+          success_count: planSuccessCount,
+          fail_count: planFailCount,
+        },
+        schedules: {
+          processed: scheduleNotifications.length,
+          success_count: scheduleSuccessCount,
+          fail_count: scheduleFailCount,
+        },
       }
     }), {
       status: 200,

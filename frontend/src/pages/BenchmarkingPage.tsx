@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Switch } from '@/components/ui/Switch'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/api'
 import { formatDate, getScoreColor, cn } from '@/lib/utils'
@@ -17,8 +18,9 @@ import {
   ReferenceLine,
   Legend,
 } from 'recharts'
-import { TrendingUp, TrendingDown, Minus, Target, ArrowLeftRight } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, Target, ArrowLeftRight, Info } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useBenchmarks } from '@/hooks/useBenchmarks'
 
 // Types
 interface Evaluation {
@@ -123,6 +125,12 @@ function CustomTooltip({ active, payload, label }: any) {
           <span className="text-muted-foreground">PO:</span>{' '}
           <span className={getScoreColor(data.po_pct)}>{data.po_pct?.toFixed(1)}%</span>
         </p>
+        {data.industry_avg !== undefined && (
+          <p className="text-sm pt-1 border-t">
+            <span className="text-muted-foreground">Prom. Industria:</span>{' '}
+            <span className="text-gray-500">{data.industry_avg?.toFixed(1)}%</span>
+          </p>
+        )}
       </div>
       {data.milestone && (
         <p className="text-xs font-medium text-primary mt-2 pt-2 border-t">
@@ -149,8 +157,12 @@ function TrendIndicator({ from, to }: { from: number; to: number }) {
   )
 }
 
+// Industry Benchmark Line component
+
 export function BenchmarkingPage() {
   const navigate = useNavigate()
+  const [showIndustryAvg, setShowIndustryAvg] = useState(false)
+
   // Fetch all evaluations
   const { data: evaluations, isLoading: evalsLoading } = useQuery({
     queryKey: ['evaluations'],
@@ -169,7 +181,26 @@ export function BenchmarkingPage() {
     },
   })
 
+  // Fetch industry benchmarks
+  const { data: benchmarks } = useBenchmarks('restaurant')
+
   const isLoading = evalsLoading || plansLoading
+
+  // Calculate industry averages
+  const industryAverages = useMemo(() => {
+    if (!benchmarks || benchmarks.length === 0) return null
+
+    const paBenchmarks = benchmarks.filter(b => b.category === 'PA')
+    const poBenchmarks = benchmarks.filter(b => b.category === 'PO')
+
+    return {
+      general: benchmarks.reduce((sum, b) => sum + b.avg_score, 0) / benchmarks.length,
+      pa: paBenchmarks.length > 0 ? paBenchmarks.reduce((sum, b) => sum + b.avg_score, 0) / paBenchmarks.length : null,
+      po: poBenchmarks.length > 0 ? poBenchmarks.reduce((sum, b) => sum + b.avg_score, 0) / poBenchmarks.length : null,
+      totalSample: benchmarks.reduce((sum, b) => sum + b.sample_size, 0),
+      source: benchmarks[0]?.source || 'GPP Research',
+    }
+  }, [benchmarks])
 
   // Prepare chart data
   const chartData = useMemo(() => {
@@ -193,9 +224,10 @@ export function BenchmarkingPage() {
         pa_pct: eval_.pa_pct,
         po_pct: eval_.po_pct,
         milestone: milestone?.label,
+        industry_avg: showIndustryAvg && industryAverages ? industryAverages.general : undefined,
       }
     })
-  }, [evaluations, actionPlans])
+  }, [evaluations, actionPlans, showIndustryAvg, industryAverages])
 
   // Calculate overall trend
   const overallTrend = useMemo(() => {
@@ -265,6 +297,37 @@ export function BenchmarkingPage() {
         </div>
       </div>
 
+      {/* Industry Benchmark Toggle */}
+      {industryAverages && (
+        <Card className="bg-muted/30">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={showIndustryAvg}
+                  onCheckedChange={setShowIndustryAvg}
+                  id="industry-avg-toggle"
+                />
+                <div>
+                  <label htmlFor="industry-avg-toggle" className="font-medium text-foreground cursor-pointer">
+                    Mostrar promedio de la industria
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    Compara tu rendimiento con el sector restaurantero
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="w-4 h-4" />
+                <span>
+                  Datos indicativos: {industryAverages.totalSample} empresas • Fuente: {industryAverages.source}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Chart Card */}
       <Card>
         <CardHeader>
@@ -308,10 +371,39 @@ export function BenchmarkingPage() {
                         general_pct: 'Cumplimiento General',
                         pa_pct: 'PA (Gestión)',
                         po_pct: 'PO (Operaciones)',
+                        industry_avg: 'Promedio Industria',
                       }
                       return labels[value] || value
                     }}
                   />
+                  
+                  {/* Industry average reference lines */}
+                  {showIndustryAvg && industryAverages && (
+                    <>
+                      <ReferenceLine
+                        y={industryAverages.general}
+                        stroke="#9ca3af"
+                        strokeDasharray="5 5"
+                        strokeWidth={2}
+                      />
+                      {industryAverages.pa && (
+                        <ReferenceLine
+                          y={industryAverages.pa}
+                          stroke="#d1d5db"
+                          strokeDasharray="3 3"
+                          strokeWidth={1}
+                        />
+                      )}
+                      {industryAverages.po && (
+                        <ReferenceLine
+                          y={industryAverages.po}
+                          stroke="#e5e7eb"
+                          strokeDasharray="3 3"
+                          strokeWidth={1}
+                        />
+                      )}
+                    </>
+                  )}
                   
                   {/* Milestone reference lines */}
                   {milestones.map((milestone, idx) => (
@@ -357,6 +449,19 @@ export function BenchmarkingPage() {
                     activeDot={{ r: 7 }}
                     name="po_pct"
                   />
+                  
+                  {/* Industry average line */}
+                  {showIndustryAvg && (
+                    <Line
+                      type="monotone"
+                      dataKey="industry_avg"
+                      stroke="#9ca3af"
+                      strokeWidth={2}
+                      strokeDasharray="5 5"
+                      dot={false}
+                      name="industry_avg"
+                    />
+                  )}
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -369,6 +474,31 @@ export function BenchmarkingPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Industry Benchmark Info */}
+      {showIndustryAvg && industryAverages && (
+        <Card className="bg-muted/20">
+          <CardHeader>
+            <CardTitle className="text-base">Benchmarks de la Industria</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-0.5 bg-gray-400 border-dashed border-t-2" />
+                <span className="text-muted-foreground">
+                  El promedio de la industria se basa en {industryAverages.totalSample} empresas del sector restaurantero
+                </span>
+              </div>
+              <p className="text-muted-foreground">
+                <strong className="text-foreground">Nota:</strong> Los datos de benchmark son indicativos y se basan en investigación interna de GPP. Los resultados individuales pueden variar según las características específicas de cada establecimiento.
+              </p>
+              <p className="text-muted-foreground">
+                Fuente: {industryAverages.source}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Milestones Legend */}
       {milestones.length > 0 && (

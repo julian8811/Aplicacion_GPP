@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   FileDown,
-  Users
+  Users,
+  Calendar
 } from 'lucide-react'
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { to: '/action-plans', icon: CheckSquare, label: 'Plan de Accion' },
   { to: '/history', icon: History, label: 'Historial' },
   { to: '/templates', icon: FileDown, label: 'Plantillas' },
+  { to: '/schedules', icon: Calendar, label: 'Programacion' },
   { to: '/compare', icon: Users, label: 'Comparar' },
   { to: '/settings', icon: Settings, label: 'Configuracion' },
 ]
@@ -41,6 +43,7 @@ const iconMap: Record<string, any> = {
   Settings,
   FileDown,
   Users,
+  Calendar,
 }
 
 export function Sidebar({ collapsed, overdueCount = 0, adminLinks = [] }: SidebarProps) {

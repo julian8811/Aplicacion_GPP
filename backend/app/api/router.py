@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api import evaluations, results, action_plans, matrices, pdf, recommendations, profiles, drafts, exports, notifications, templates, comparison, export
+from app.api import evaluations, results, action_plans, matrices, pdf, recommendations, profiles, drafts, exports, notifications, templates, comparison, export, schedules, benchmarks
 from app.auth.router import router as auth_router
 
 api_router = APIRouter(prefix="/api")
@@ -18,3 +18,5 @@ api_router.include_router(notifications.router)
 api_router.include_router(templates.router)
 api_router.include_router(comparison.router)
 api_router.include_router(export.router)
+api_router.include_router(schedules.router)
+api_router.include_router(benchmarks.router)

@@ -44,7 +44,11 @@ setIsCreating(true)
       // Navigate to wizard with evaluation ID and type
       navigate(`/evaluate/wizard?id=${evaluation.id}&type=${selectedType}`)
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Error al crear evaluacion')
+      console.error('Error completo:', error)
+      console.error('Response data:', error.response?.data)
+      console.error('Response status:', error.response?.status)
+      const errorMessage = error.response?.data?.detail || error.message || 'Error al crear evaluacion'
+      toast.error(errorMessage)
     } finally {
       setIsCreating(false)
     }

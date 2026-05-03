@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import Response
 from supabase import create_client
 from app.config import get_settings
 from app.recomendaciones import MATRIZ_RECOMENDACIONES
+from app.core.dependencies import get_current_user
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
@@ -200,7 +201,7 @@ def _style_header(ws, row, num_cols):
 
 
 @router.get("/excel/{evaluation_id}")
-async def export_evaluation_to_excel(evaluation_id: str):
+async def export_evaluation_to_excel(evaluation_id: str, user: dict = Depends(get_current_user)):
     """Generate an Excel file with evaluation results, breakdowns, recommendations, and action plans."""
     supabase = get_supabase_client()
     

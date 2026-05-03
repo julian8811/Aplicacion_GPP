@@ -114,11 +114,15 @@ async def delete_template(template_id: str, user: dict = Depends(get_current_use
     return {"message": "Template deleted successfully"}
 
 
+class TemplateFromEvaluation(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+
 @router.post("/from-evaluation/{evaluation_id}")
 async def create_template_from_evaluation(
     evaluation_id: str,
-    name: str,
-    description: Optional[str] = None,
+    data: TemplateFromEvaluation,
     user: dict = Depends(get_current_user)
 ):
     """Create a template from an existing evaluation"""
@@ -145,8 +149,8 @@ async def create_template_from_evaluation(
     
     # Create template
     template_data = {
-        "name": name,
-        "description": description or f"Template created from evaluation {evaluation_id[:8]}...",
+        "name": data.name,
+        "description": data.description or f"Template created from evaluation {evaluation_id[:8]}...",
         "pa_config": pa_config,
         "po_config": po_config,
         "is_public": False,

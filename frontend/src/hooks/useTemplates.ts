@@ -96,7 +96,10 @@ export function useCreateTemplateFromEvaluation() {
       name: string
       description?: string
     }) => {
-      const response = await api.post(`/templates/from-evaluation/${data.evaluation_id}?name=${encodeURIComponent(data.name)}&description=${encodeURIComponent(data.description || '')}`, {})
+      const response = await api.post(`/templates/from-evaluation/${data.evaluation_id}`, {
+        name: data.name,
+        description: data.description || '',
+      })
       return response.data
     },
     onSuccess: () => {

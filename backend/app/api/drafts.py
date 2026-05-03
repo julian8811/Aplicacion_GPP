@@ -1,10 +1,11 @@
 import os
 import json
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import FileResponse
 from typing import Optional
 import uuid
+from app.core.dependencies import get_current_user
 
 router = APIRouter(prefix="/drafts", tags=["drafts"])
 
@@ -18,7 +19,7 @@ def _ensure_drafts_dir():
 
 
 @router.post("")
-async def save_draft(data: dict):
+async def save_draft(data: dict, user: dict = Depends(get_current_user)):
     """
     Save evaluation draft as a JSON file.
     
@@ -54,7 +55,7 @@ async def save_draft(data: dict):
 
 
 @router.get("/{filename}")
-async def load_draft(filename: str):
+async def load_draft(filename: str, user: dict = Depends(get_current_user)):
     """
     Load a draft file by filename.
     
@@ -80,7 +81,7 @@ async def load_draft(filename: str):
 
 
 @router.get("")
-async def list_drafts():
+async def list_drafts(user: dict = Depends(get_current_user)):
     """List all available draft files."""
     _ensure_drafts_dir()
     

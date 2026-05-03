@@ -5,10 +5,20 @@ from app.config import get_settings
 
 app = FastAPI(title="GPP API", version="1.0.0", description="Gestion Por Procesos API")
 
-# CORS middleware
+# Startup configuration validation
 settings = get_settings()
+required_config = [
+    ("SUPABASE_URL", settings.supabase_url),
+    ("SUPABASE_ANON_KEY", settings.supabase_anon_key),
+]
+missing_config = [name for name, value in required_config if not value]
+if missing_config:
+    raise ValueError(
+        f"Missing required environment variables: {', '.join(missing_config)}. "
+        "Set these variables before starting the application."
+    )
 
-# Build allowed origins dynamically from environment
+# Build allowed origins from environment and defaults
 dynamic_origins = []
 if settings.VERCEL_URL:
     dynamic_origins.append(f"https://{settings.VERCEL_URL}")
@@ -19,16 +29,22 @@ if settings.RAILWAY_PUBLIC_DOMAIN:
 static_origins = [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://frontend-iota-blond-75.vercel.app",
-    "https://*.vercel.app",
 ]
 
+# Parse configurable CORS_ORIGINS from env (comma-separated, supports wildcards)
+env_cors_origins = []
+if settings.cors_origins:
+    env_cors_origins = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
+
+# Add Vercel wildcard for all subdomains
+vercel_wildcard = "https://*.vercel.app"
+
 # Combine and filter out empty strings
-origins = list(filter(None, set(static_origins + dynamic_origins)))
+all_origins = list(filter(None, set(static_origins + dynamic_origins + env_cors_origins + [vercel_wildcard])))
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=all_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

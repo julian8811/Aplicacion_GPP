@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import Response
 from supabase import create_client
 from app.config import get_settings
 from app.pdf_generator import crear_pdf_auditoria
+from app.core.dependencies import get_current_user
 
 router = APIRouter(prefix="/pdf", tags=["pdf"])
 
@@ -13,7 +14,7 @@ def get_supabase_client():
 
 
 @router.get("/{evaluation_id}")
-async def get_pdf(evaluation_id: str):
+async def get_pdf(evaluation_id: str, user: dict = Depends(get_current_user)):
     """Generate and download PDF for an evaluation"""
     supabase = get_supabase_client()
 

@@ -27,6 +27,7 @@ export function SettingsPage() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [establishmentName, setEstablishmentName] = useState('')
 
   // Branding state
   const [branding, setBranding] = useState<BrandingSettings>({
@@ -36,25 +37,26 @@ export function SettingsPage() {
   })
   const [brandingSaved, setBrandingSaved] = useState(false)
   const [isUploadingLogo, setIsUploadingLogo] = useState(false)
-  const establishmentName = 'Mi Establecimiento'
 
-  // Fetch current branding on mount
+  // Fetch profile data on mount
   useEffect(() => {
-    async function fetchBranding() {
+    async function fetchProfile() {
       try {
-        const response = await api.get('/profiles/me/branding')
+        const response = await api.get('/profiles/me')
         if (response.data) {
-          setBranding({
+          setEstablishmentName(response.data.establishment_name || '')
+          setBranding(prev => ({
+            ...prev,
             logo_url: response.data.logo_url || null,
             primary_color: response.data.primary_color || '#2563eb',
             footer_text: response.data.footer_text || '',
-          })
+          }))
         }
       } catch (error) {
-        console.error('Failed to fetch branding:', error)
+        console.error('Failed to fetch profile:', error)
       }
     }
-    fetchBranding()
+    fetchProfile()
   }, [])
 
   const handleGoogleConnect = () => {
@@ -128,6 +130,7 @@ export function SettingsPage() {
 
     try {
       await api.patch('/profiles/me', {
+        establishment_name: establishmentName,
         logo_url: branding.logo_url,
         primary_color: branding.primary_color,
         footer_text: branding.footer_text,

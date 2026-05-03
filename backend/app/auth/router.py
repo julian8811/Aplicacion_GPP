@@ -41,13 +41,24 @@ async def signup(data: SignupRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error creating user: {str(e)}")
 
+    # Get role from user metadata, default to 'owner' for first signup
+    user_role = "owner"
+    try:
+        supabase_admin = get_supabase_admin_client()
+        # Check if any profiles exist - if not, this is the first user (owner)
+        existing_profiles = supabase_admin.table("profiles").select("id").limit(1).execute()
+        if existing_profiles.data:
+            user_role = "editor"  # Subsequent users default to editor
+    except Exception:
+        pass  # Default to editor if check fails
+
     # Create profile
     try:
         profile_data = {
             "id": user_id,
             "email": data.email,
             "establishment_name": data.establishment_name,
-            "role": "editor"
+            "role": user_role
         }
         supabase_admin.table("profiles").insert(profile_data).execute()
     except Exception as e:
@@ -68,7 +79,7 @@ async def signup(data: SignupRequest):
         user=UserResponse(
             id=user_id,
             email=data.email,
-            role="editor",
+            role=user_role,
             establishment_name=data.establishment_name
         )
     )
@@ -92,11 +103,12 @@ async def login(data: LoginRequest):
     user = session_response.user
     user_metadata = user.user_metadata or {}
 
-    # Update last_login in profile
+    # Update last_login in profile with proper ISO 8601 timestamp
+    from datetime import datetime, timezone
     try:
         supabase_admin = get_supabase_admin_client()
         supabase_admin.table("profiles").update({
-            "last_login": "now()"
+            "last_login": datetime.now(timezone.utc).isoformat()
         }).eq("id", user.id).execute()
     except Exception:
         pass  # Non-critical if this fails

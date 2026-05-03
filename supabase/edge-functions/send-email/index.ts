@@ -261,6 +261,38 @@ serve(async (req) => {
     })
   }
 
+  // Validate JWT token
+  const authHeader = req.headers.get("Authorization")
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Missing or invalid authorization header" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    })
+  }
+
+  const token = authHeader.slice(7)
+
+  // Verify the JWT using Supabase
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+  } catch (error) {
+    return new Response(JSON.stringify({ error: "Token validation failed" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    })
+  }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!

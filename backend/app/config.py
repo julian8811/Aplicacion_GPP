@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    # Supabase (optional - empty default allows app to start without env vars)
+    # Supabase (required for production)
     supabase_url: str = ""
     supabase_anon_key: str = ""
     supabase_service_key: str = ""
@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     VERCEL_URL: str = ""
     RAILWAY_PUBLIC_DOMAIN: str = ""
     port: int = 8080
+
+    # CORS - comma-separated list of allowed origins
+    cors_origins: str = ""
 
     establishment_name: str = "Establecimiento GPP"
 

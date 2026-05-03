@@ -156,17 +156,17 @@ function FilterBar({
 export function RecommendationsPage() {
   const [searchParams] = useSearchParams()
   const evaluationId = searchParams.get('evaluation_id') || ''
-  
-  const { data: recommendations, isLoading } = useRecommendations(evaluationId)
+
+  const { data: recommendations, isLoading } = useRecommendations(evaluationId || '')
   const createActionPlan = useCreateActionPlan()
-  
+
   const [priorityFilter, setPriorityFilter] = useState<string>('ALL')
-  
+
   // Filter recommendations by priority
   const filteredRecommendations = recommendations?.filter(
     (rec) => priorityFilter === 'ALL' || rec.priority === priorityFilter
   ) || []
-  
+
   // Handle creating action plan from recommendation
   const handleCreateAction = (rec: Recommendation) => {
     createActionPlan.mutate({
@@ -178,7 +178,21 @@ export function RecommendationsPage() {
       status: 'pendiente',
     })
   }
-  
+
+  if (!evaluationId) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-foreground">Recomendaciones</h1>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">No se encontró el ID de la evaluación. Por favor, accedé desde la página de resultados.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">

@@ -19,6 +19,7 @@ import {
 import { Download, Plus, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import { cn, getScoreColor } from '@/lib/utils'
+import { toast } from '@/lib/toast'
 
 // Types for ResultsPage
 interface ResultsData {
@@ -217,28 +218,36 @@ function DetailTable({
 
 // PDF download handler
 async function handleDownloadPDF(id: string) {
-  const response = await api.get(`/pdf/${id}`, { responseType: 'blob' })
-  const url = window.URL.createObjectURL(new Blob([response.data]))
-  const link = document.createElement('a')
-  link.href = url
-  link.setAttribute('download', `auditoria-${id}.pdf`)
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
+  try {
+    const response = await api.get(`/pdf/${id}`, { responseType: 'blob' })
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `auditoria-${id}.pdf`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    toast.error('Error al descargar el PDF')
+  }
 }
 
 // Excel export handler
 async function handleDownloadExcel(id: string) {
-  const response = await api.get(`/export/excel/${id}`, { responseType: 'blob' })
-  const url = window.URL.createObjectURL(new Blob([response.data]))
-  const link = document.createElement('a')
-  link.href = url
-  link.setAttribute('download', `auditoria-${id}.xlsx`)
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
+  try {
+    const response = await api.get(`/export/excel/${id}`, { responseType: 'blob' })
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `auditoria-${id}.xlsx`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    toast.error('Error al descargar el Excel')
+  }
 }
 
 export function ResultsPage() {

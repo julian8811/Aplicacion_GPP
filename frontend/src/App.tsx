@@ -13,30 +13,33 @@ import { BenchmarkingPage } from '@/pages/BenchmarkingPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { NewEvaluationPage } from '@/pages/NewEvaluationPage'
 import { Toaster } from 'sonner'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 
 export default function App() {
   return (
     <>
       <Toaster position="top-right" richColors />
-      <Routes>
-        <Route path="/" element={<AppShell />}>
-          <Route index element={<Navigate to="/dashboard" />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="evaluate" element={<NewEvaluationPage />} />
-          <Route path="evaluate/wizard" element={<EvaluationWizardPage />} />
-          <Route path="evaluate/pa" element={<PAEvaluationPage />} />
-          <Route path="evaluate/po" element={<POEvaluationPage />} />
-          <Route path="evaluate/:id" element={<EvaluationPage />} />
-          <Route path="results" element={<ResultsPage />} />
-          <Route path="results/:id" element={<ResultsPage />} />
-          <Route path="action-plans" element={<ActionPlanPage />} />
-          <Route path="recommendations" element={<RecommendationsPage />} />
-          <Route path="history" element={<HistoryPage />} />
-          <Route path="benchmarking" element={<BenchmarkingPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<AppShell />}>
+            <Route index element={<Navigate to="/dashboard" />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="evaluate" element={<NewEvaluationPage />} />
+            <Route path="evaluate/wizard" element={<EvaluationWizardPage />} />
+            <Route path="evaluate/pa" element={<PAEvaluationPage />} />
+            <Route path="evaluate/po" element={<POEvaluationPage />} />
+            <Route path="evaluate/:id" element={<EvaluationPage />} />
+            <Route path="results" element={<ResultsPage />} />
+            <Route path="results/:id" element={<ResultsPage />} />
+            <Route path="action-plans" element={<ActionPlanPage />} />
+            <Route path="recommendations" element={<RecommendationsPage />} />
+            <Route path="history" element={<HistoryPage />} />
+            <Route path="benchmarking" element={<BenchmarkingPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </ErrorBoundary>
     </>
   )
 }

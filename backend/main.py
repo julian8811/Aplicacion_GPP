@@ -7,13 +7,24 @@ app = FastAPI(title="GPP API", version="1.0.0", description="Gestion Por Proceso
 
 # CORS middleware
 settings = get_settings()
-origins = [
+
+# Build allowed origins dynamically from environment
+dynamic_origins = []
+if settings.VERCEL_URL:
+    dynamic_origins.append(f"https://{settings.VERCEL_URL}")
+if settings.RAILWAY_PUBLIC_DOMAIN:
+    dynamic_origins.append(f"https://{settings.RAILWAY_PUBLIC_DOMAIN}")
+
+# Static local origins
+static_origins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "https://frontend-iota-blond-75.vercel.app",
     "https://*.vercel.app",
-    "*",  # Allow all origins for development
 ]
+
+# Combine and filter out empty strings
+origins = list(filter(None, set(static_origins + dynamic_origins)))
 
 app.add_middleware(
     CORSMiddleware,

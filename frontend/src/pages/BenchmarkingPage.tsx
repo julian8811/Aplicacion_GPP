@@ -424,11 +424,11 @@ export function BenchmarkingPage() {
             <CardContent className="pt-6">
               <div className="text-center">
                 <p className="text-sm font-medium text-muted-foreground mb-1">Mejor Resultado</p>
-                <p className={cn('text-2xl font-bold', getScoreColor(Math.max(...chartData.map(d => d.general_pct))))}>
-                  {Math.max(...chartData.map(d => d.general_pct)).toFixed(0)}%
+                <p className={cn('text-2xl font-bold', getScoreColor(chartData.length > 0 ? Math.max(...chartData.map(d => d.general_pct)) : 0))}>
+                  {chartData.length > 0 ? Math.max(...chartData.map(d => d.general_pct)).toFixed(0) : 0}%
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formatDate(chartData.find(d => d.general_pct === Math.max(...chartData.map(d => d.general_pct)))?.fecha || '')}
+                  {chartData.length > 0 ? formatDate(chartData.find(d => d.general_pct === Math.max(...chartData.map(d => d.general_pct)))?.fecha || '') : ''}
                 </p>
               </div>
             </CardContent>

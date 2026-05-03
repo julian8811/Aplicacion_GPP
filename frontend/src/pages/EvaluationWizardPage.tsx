@@ -389,12 +389,11 @@ export function EvaluationWizardPage() {
 interface ReviewStepProps {
   paValues: Record<string, Record<string, number>>
   poValues: Record<string, Record<string, number>>
-  matrices: MatrixData
   onSaveDraft?: () => void
   onLoadDraft?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-function ReviewStep({ paValues, poValues, onSaveDraft, onLoadDraft }: Omit<ReviewStepProps, 'matrices'>) {
+function ReviewStep({ paValues, poValues, onSaveDraft, onLoadDraft }: ReviewStepProps) {
   const paAspects = Object.keys(paValues)
   const poAspects = Object.keys(poValues)
 

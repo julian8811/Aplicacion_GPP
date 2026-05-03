@@ -1,0 +1,15 @@
+schema: spec-driven
+change: gpp-missing-features
+created: 2026-05-02T18:04:00Z
+
+artifacts:
+  exploration: exists
+  specs: created
+
+dependencies:
+  - openspec/specs/evaluations/spec.md
+  - openspec/specs/recommendations/spec.md
+  - openspec/specs/matrices/spec.md
+  - openspec/specs/frontend/spec.md
+
+next_phase: sdd-design

@@ -1,0 +1,27 @@
+schema: spec-driven
+change: gpp-frontend-redesign
+created: 2026-05-01
+
+artifact_paths:
+  proposal: proposal.md
+  design: design.md
+  tasks: tasks.md
+  specs_dir: specs/
+
+phase: proposed
+
+deps:
+  - proposal → specs
+  - proposal → design
+  - specs → design
+  - design → tasks
+
+status: |
+  SDD cycle complete. Ready for implementation.
+  All artifacts created:
+  - proposal.md
+  - design.md
+  - tasks.md
+  - specs/ (10 domain specs)
+
+  Next step: /sdd-apply gpp-frontend-redesign

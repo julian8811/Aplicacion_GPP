@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .bento-card {
+    @apply bg-white p-6 rounded-lg border border-border shadow-ambient mb-6;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:-translate-y-0.5 hover:shadow-lift hover:border-slate-300;
+  }
+}
+
+/* Mobile-specific utilities */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* Safe area for mobile bottom nav */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Horizontal scroll for tables on mobile */
+.table-scroll-container {
+  @apply overflow-x-auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Form stacking on mobile */
+@media (max-width: 768px) {
+  .form-stack {
+    @apply flex flex-col gap-4;
+  }
+
+  .form-stack > * {
+    @apply w-full;
+  }
+}

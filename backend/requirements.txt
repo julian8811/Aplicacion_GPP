@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+supabase
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+fpdf2
+pandas
+numpy
+pytest
+pytest-cov
+httpx
+pydantic-settings>=2.0.0
+openpyxl

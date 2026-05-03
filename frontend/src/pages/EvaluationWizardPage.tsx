@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useMatrices, useCalculateResults, useUpdateEvaluation } from '@/hooks/useApi'
+import { useTemplate } from '@/hooks/useTemplates'
 import { useDraftStore } from '@/store/draftStore'
 import { PAEvaluationPage } from './PAEvaluationPage'
 import { POEvaluationPage } from './POEvaluationPage'
@@ -9,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/utils'
 import { toast } from '@/lib/toast'
+import { FileUp } from 'lucide-react'
 
 type Step = 'pa' | 'po' | 'review'
 
@@ -40,7 +42,9 @@ export function EvaluationWizardPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const evaluationId = searchParams.get('id') || ''
+  const templateId = searchParams.get('template_id') || ''
   const { data: matrices, isLoading } = useMatrices()
+  const { data: template } = useTemplate(templateId)
   const calculateResults = useCalculateResults()
   const updateEvaluation = useUpdateEvaluation()
   const { paDraft, poDraft, setPADraft, setPODraft, clearDrafts } = useDraftStore()
@@ -50,6 +54,27 @@ export function EvaluationWizardPage() {
   const [poValues, setPoValues] = useState<Record<string, Record<string, number>>>({})
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(templateId)
+
+  // Load template data if template_id is present
+  useEffect(() => {
+    if (template && template.pa_config && template.po_config) {
+      const paQuestions = template.pa_config.questions || {}
+      const poQuestions = template.po_config.questions || {}
+      
+      if (Object.keys(paQuestions).length > 0) {
+        setPaValues(paQuestions)
+        setPADraft(paQuestions)
+      }
+      if (Object.keys(poQuestions).length > 0) {
+        setPoValues(poQuestions)
+        setPODraft(poQuestions)
+      }
+      
+      setSelectedTemplateId(template.id)
+      toast.success(`Plantilla "${template.name}" cargada`)
+    }
+  }, [template, setPADraft, setPODraft])
 
   // Initialize from draft store
   useEffect(() => {
@@ -261,11 +286,19 @@ export function EvaluationWizardPage() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Progreso de Evaluación</h2>
-            {lastSaved && (
-              <Badge variant="success">
-                Último guardado: {formatTime(lastSaved)}
-              </Badge>
-            )}
+            <div className="flex items-center gap-3">
+              {lastSaved && (
+                <Badge variant="success">
+                  Último guardado: {formatTime(lastSaved)}
+                </Badge>
+              )}
+              {selectedTemplateId && (
+                <Badge variant="info">
+                  <FileUp className="w-3 h-3 mr-1" />
+                  Plantilla cargada
+                </Badge>
+              )}
+            </div>
           </div>
           
           <div className="flex items-center justify-between">

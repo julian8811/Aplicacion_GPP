@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/api'
 import { formatDate, getScoreColor, cn } from '@/lib/utils'
@@ -16,7 +17,8 @@ import {
   ReferenceLine,
   Legend,
 } from 'recharts'
-import { TrendingUp, TrendingDown, Minus, Target } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, Target, ArrowLeftRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 // Types
 interface Evaluation {
@@ -148,6 +150,7 @@ function TrendIndicator({ from, to }: { from: number; to: number }) {
 }
 
 export function BenchmarkingPage() {
+  const navigate = useNavigate()
   // Fetch all evaluations
   const { data: evaluations, isLoading: evalsLoading } = useQuery({
     queryKey: ['evaluations'],
@@ -246,14 +249,20 @@ export function BenchmarkingPage() {
             Tendencia de tus evaluaciones a lo largo del tiempo
           </p>
         </div>
-        {overallTrend && (
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-muted-foreground">
-              Evolución general:
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate('/compare')}>
+            <ArrowLeftRight className="w-4 h-4 mr-2" />
+            Comparar 2 evaluaciones
+          </Button>
+          {overallTrend && (
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-muted-foreground">
+                Evolución general:
+              </div>
+              <TrendIndicator from={overallTrend.from} to={overallTrend.to} />
             </div>
-            <TrendIndicator from={overallTrend.from} to={overallTrend.to} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Chart Card */}

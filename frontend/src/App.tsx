@@ -12,6 +12,9 @@ import { HistoryPage } from '@/pages/HistoryPage'
 import { BenchmarkingPage } from '@/pages/BenchmarkingPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { NewEvaluationPage } from '@/pages/NewEvaluationPage'
+import { TemplatesPage } from '@/pages/TemplatesPage'
+import { ComparisonPage } from '@/pages/ComparisonPage'
+import { ExportPage } from '@/pages/admin/ExportPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { SignupPage } from '@/pages/auth/SignupPage'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
@@ -43,7 +46,10 @@ export default function App() {
             <Route path="recommendations" element={<RecommendationsPage />} />
             <Route path="history" element={<HistoryPage />} />
             <Route path="benchmarking" element={<BenchmarkingPage />} />
+            <Route path="templates" element={<TemplatesPage />} />
+            <Route path="compare" element={<ComparisonPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="admin/export" element={<ExportPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
